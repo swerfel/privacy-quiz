@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import QuestionView from './QuestionView';
+import { Question } from './Question';
+import { Answer } from './Answer';
+import { Statistics } from './Statistics';
+import { useSubscription } from '../util/Sockets'
 
 function QuestionsList() {
-  const [questions, setQuestions] = useState([
-    {id: 1, question: "Frage 1?"},
-    {id: 2, question: "Frage 2?"}]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [statistics, setStatistics] = useState<Statistics[]>([]);
+  useSubscription("questions", (q: Question[]) => {console.log(JSON.stringify(q));setQuestions(q)});
+  useSubscription("answers", setAnswers);
+  useSubscription("statistics", setStatistics);
 
   return (
     <div>
-      {questions.map((question) =>
+      {questions.map((question, index) =>
         <QuestionView key={question.id}
-                  question={question} />
+                  question={question} answer={answers[index]} statistics={statistics[index]}/>
       )}
     </div>
   );

@@ -10,7 +10,7 @@ const Container = styled.header`
     color: lightgray
 `
 
-const Title = styled.h3`
+const Title = styled.h2`
     color: white;
     font-size: calc(10px + 2vmin);
 `
