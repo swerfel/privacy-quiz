@@ -43,6 +43,7 @@ class Statistics {
   id: number;
   yesAnswers = 0;
   noAnswers = 0;
+  percentage = 50;
 
   constructor(id: number) {
     this.id = id;
@@ -54,6 +55,13 @@ class Statistics {
     } else if (answer === "no") {
       this.noAnswers++;
     }
+    this.updatePercentage();
+  }
+
+  updatePercentage(){
+    var total = this.yesAnswers + this.noAnswers;
+    if (total > 0)
+      this.percentage = Math.round(this.yesAnswers / total * 100);
   }
 }
 
@@ -61,6 +69,8 @@ class Client {
   socket: Socket;
   answers: Answer[];
   statistics: Statistics[];
+  score: number = 0;
+  scoredEstimates: number = 0;
   constructor(socket: Socket) {
     this.socket = socket;
     this.answers = rawQuestions.map((_q, index) => new Answer(index));
@@ -86,29 +96,65 @@ var dirty = true;
 var clients = {};
 
 function nextQuestion(){
-  if (currentQuestionIndex < rawQuestions.length)
+  if (currentQuestionIndex < rawQuestions.length) {
+    if (currentQuestionIndex >= 0)
+      finalizeCurrentQuestion();
     currentQuestionIndex++;
+  }
   if (currentQuestionIndex < rawQuestions.length) {
     questions.push(new Question(currentQuestionIndex, rawQuestions[currentQuestionIndex]));
     statistics.push(new Statistics(currentQuestionIndex));
-    if (currentQuestionIndex > 0)
-      questions[currentQuestionIndex-1].isActive = false;
   }
   console.log("switching to question "+currentQuestionIndex);
   dirty = true;
   sendUpdateToAllSockets();
 }
 
+function finalizeCurrentQuestion(){
+  questions[currentQuestionIndex].isActive = false;
+  Object.values(clients).forEach(computeScore);
+}
+
+function computeDifference(client: Client, questionIndex: number) {
+  var realValue = statistics[questionIndex].percentage;
+  var estimate = client.answers[questionIndex].estimate;
+  if (!estimate) {
+    estimate = (realValue < 50)? 100: 0;
+  }
+  return  Math.abs(realValue - estimate);
+}
+
+function computeScore(client: Client) {
+  client.scoredEstimates++;
+  client.score += computeDifference(client, currentQuestionIndex);
+}
+
 function sendUpdateToAllSockets() {
   if (dirty) {
     dirty = false;
+    io.emit("questions", questions);
     Object.values(clients).forEach(sendUpdatesToSocket);
+    io.emit("scores", computeCurrentScores());
   }
 }
 
 function sendUpdatesToSocket(client: Client) {
-  client.socket.emit("questions", questions);
   client.socket.emit("statistics", client.statistics);
+}
+
+function computeCurrentScores(){
+  var scores = Object.values(clients).map((client: Client) => {return {playerName: client.socket.id, score: client.score}})
+  scores.sort(function(a, b){
+    if (a.score != b.score)
+      return a.score - b.score;
+    var x = a.playerName.toLowerCase();
+    var y = b.playerName.toLowerCase();
+    if (x < y) {return -1;}
+    if (x > y) {return 1;}
+    return 0;
+  });
+  console.log("scores: "+JSON.stringify(scores));
+  return scores;
 }
 
 function isAnswerValid(answerObj: Answer) {
@@ -127,22 +173,43 @@ function isAnswerValid(answerObj: Answer) {
   return true;
 }
 
-function isEstimateValid(estimate?: number) {
-  return typeof estimate !== 'undefined' && estimate >= 0 && estimate <= 100
+function isEstimateValid(answerObj: Answer) {
+  var estimate = answerObj.estimate
+  if (!(typeof estimate !== 'undefined' && estimate >= 0 && estimate <= 100)){
+    console.log("Illegal estimate received:" + estimate);
+    return false;
+  }
+
+  var id = answerObj.id;
+  if ( id < 0 || id > questions.length || !questions[id].isActive ) {
+    console.log("Illegal answer id received: " + id + " but current id is " + currentQuestionIndex);
+    return false;
+  }
+
+  return true;
 }
 
 io.on("connection", (socket: Socket) => {
   console.log("client connected " + socket.id);
   clients[socket.id] = new Client(socket);
   socket.emit("questions", questions);
+  if (clients[socket.id].scoredEstimates < currentQuestionIndex) {
+    var score = 0;
+    for(var i=0; i <= currentQuestionIndex; i++) {
+      score += computeDifference(clients[socket.id], i);
+    }
+    clients[socket.id].scoredEstimates = currentQuestionIndex+1;
+    clients[socket.id].score = score;
+  }
+  dirty=true;
 
   socket.on("disconnect", _reason => {
     delete clients[socket.id];
   })
 
   socket.on("answer", a => {
+    console.log("received answer " + JSON.stringify(a));
     if (isAnswerValid(a)) {
-      console.log("received answer " + JSON.stringify(a));
       var client = clients[socket.id];
       client.answers[a.id].answer =  a.answer;
       statistics[a.id].addAnswer(a.answer);
@@ -155,8 +222,8 @@ io.on("connection", (socket: Socket) => {
   })
 
   socket.on("estimate", a => {
-    if (isEstimateValid(a.estimate)) {
-      console.log("received estimate " + JSON.stringify(a));
+    console.log("received estimate " + JSON.stringify(a));
+    if (isEstimateValid(a)) {
       var client = clients[socket.id];
       client.answers[a.id].estimate =  a.estimate;
 

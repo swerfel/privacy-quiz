@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 
 import QuestionView from './QuestionView';
@@ -28,7 +28,7 @@ function QuestionsList() {
 
   useSubscription("questions", onNewQuestions);
   useSubscription("answers", setAnswers);
-  useSubscription("statistics", setStatistics);
+  useSubscription("statistics", (s: Statistics[]) => {setStatistics(s); console.log(s)});
 
   return (
     <Accordion defaultActiveKey="0" activeKey={activeQuestion} onSelect={onSelect}>

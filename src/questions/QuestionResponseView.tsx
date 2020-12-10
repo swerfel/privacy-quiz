@@ -58,10 +58,8 @@ export function QuestionResponseView({ question, answer } : {question: Question,
     <Card>
       <Card.Body>
         <Card.Title>Deine Antworten:</Card.Title>
-        <Card.Text>
-          <YesNoResponse question={question} answer={answer}/>
-          <PercentageEstimateResponse question={question} answer={answer}/>
-        </Card.Text>
+        <YesNoResponse question={question} answer={answer}/>
+        <PercentageEstimateResponse question={question} answer={answer}/>
       </Card.Body>
     </Card>
     </>)

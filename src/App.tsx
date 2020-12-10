@@ -1,16 +1,30 @@
 import React from 'react';
+
+
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 import './App.css';
 import Header from './Header';
 import QuestionsList from './questions/QuestionsList';
 import AdminControls from './admin/AdminControls';
+import HallOfFame from './scoring/HallOfFame';
 
 function App() {
   return (
-    <div className="App">
-      <Header/>
-      <AdminControls/>
-      <QuestionsList/>
-    </div>
+    <Container  className="App">
+      <Row>
+        <Col><Header/></Col>
+      </Row>
+      <Row>
+        <Col><AdminControls/></Col>
+      </Row>
+      <Row>
+        <Col sm={8}><QuestionsList/></Col>
+        <Col sm={4}><HallOfFame/></Col>
+      </Row>
+    </Container>
   );
 }
 
