@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import Accordion from 'react-bootstrap/Accordion';
+
 import QuestionView from './QuestionView';
 import { Question } from './Question';
 import { Answer } from './Answer';
@@ -8,18 +10,33 @@ import { useSubscription } from '../util/Sockets'
 function QuestionsList() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [statistics, setStatistics] = useState<Statistics[]>([]);
-  useSubscription("questions", (q: Question[]) => {console.log(JSON.stringify(q));setQuestions(q)});
+  const [statistics, setStatistics] = useState<Statistics[]>([])
+  const [activeQuestion, setActiveQuestion] = useState<string>("0");
+
+  function onNewQuestions(newQuestions: Question[]){
+    newQuestions.reverse(); // newest Quesion on the top
+    setQuestions(newQuestions);
+    var newActive = newQuestions.find(q => q.isActive);
+    if (newActive)
+      setActiveQuestion(String(newActive.id));
+  }
+
+  function onSelect(eventKey: string | null, _event: any) {
+    if (eventKey)
+      setActiveQuestion(eventKey);
+  }
+
+  useSubscription("questions", onNewQuestions);
   useSubscription("answers", setAnswers);
   useSubscription("statistics", setStatistics);
 
   return (
-    <div>
-      {questions.map((question, index) =>
+    <Accordion defaultActiveKey="0" activeKey={activeQuestion} onSelect={onSelect}>
+      {questions.map(question =>
         <QuestionView key={question.id}
-                  question={question} answer={answers[index]} statistics={statistics[index]}/>
+                  question={question} answer={answers[question.id]} statistics={statistics[question.id]}/>
       )}
-    </div>
+    </Accordion>
   );
 }
 

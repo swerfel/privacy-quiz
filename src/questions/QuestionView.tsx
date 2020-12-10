@@ -1,60 +1,39 @@
+import Button from 'react-bootstrap/Button';
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 
 import { Question } from './Question';
 import { Answer } from './Answer';
 import { Statistics } from './Statistics';
-import { Button } from '../base/Button'
-import { socket } from '../util/Sockets';
+import { StatisticsView } from './StatisticsView';
+import { QuestionResponseView } from './QuestionResponseView';
 
-function AnsweredButton({ answer } : {answer: Answer}) {
-  let text = "<nicht beantwortet>";
-  if (answer.answer === "yes")
-    text = "Ja"
-  if (answer.answer === "no")
-    text = "Nein"
-  return (
-    <Button disabled>{text}</Button>
-  );
-}
-
-function Results({ statistics } : {statistics: Statistics}) {
-  if (statistics && (statistics.yesAnswers + statistics.noAnswers) > 0) {
-    var total = statistics.yesAnswers + statistics.noAnswers;
-    var persentage = statistics.yesAnswers / total * 100;
-    var roundedPercentage = Math.round(persentage);
-    return (
-      <span>{roundedPercentage}% der andrenas haben auf diese Frage mit "Ja" geantwortet</span>
-    );
-  } else
-    return null;
-}
-
-function QuestionControls({ question, answer } : {question: Question, answer: Answer}) {
-  if (answer && (answer.answer === "yes" || answer.answer === "no"))
-    return (<AnsweredButton answer={answer}/>)
-  else if (question.isActive) {
-    var onResponse = (response: string) => {
-      return () => socket.emit("answer", {id: question.id, answer: response})
-    }
-    return (<div>
-        <Button onClick={onResponse("yes")}>Ja</Button>
-        <Button onClick={onResponse("no")}>Nein</Button>
-      </div>)
-  } else
-    return null;
-}
 
 function QuestionView({ question, answer, statistics } : {question: Question, answer: Answer, statistics: Statistics}) {
   return (
-    <div>
-      <h3>
-        { question.question }
-      </h3>
-      <div>
-        <span>Deine Antwort: </span>
-        <QuestionControls question={question} answer={answer}/>
-      </div>
-      <Results statistics={statistics}/>
-    </div>
+    <Card>
+    <style type="text/css">
+      {`
+      .accordion .card-header .btn-link {
+        font-weight: bold;
+        font-size: 1.3em;
+        text-align: left;
+      }
+      `}
+    </style>
+      <Card.Header>
+        <Accordion.Toggle as={Button} variant={question.isActive?"link":"button"} eventKey={String(question.id)}>
+          { question.question }
+        </Accordion.Toggle>
+      </Card.Header>
+      <Accordion.Collapse eventKey={String(question.id)}>
+        <Card.Body>
+          <QuestionResponseView question={question} answer={answer}/>
+          <br/>
+          <StatisticsView statistics={statistics}/>
+        </Card.Body>
+      </Accordion.Collapse>
+    </Card>
   );
 }
 

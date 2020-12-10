@@ -20,6 +20,9 @@ var Answer = /** @class */ (function () {
     function Answer(id) {
         this.id = id;
     }
+    Answer.prototype.isEverythingAnswered = function () {
+        return (this.answer === "yes" || this.answer === "no") && (typeof this.estimate !== 'undefined' && this.estimate >= 0 && this.estimate <= 100);
+    };
     return Answer;
 }());
 var Statistics = /** @class */ (function () {
@@ -47,14 +50,14 @@ var Client = /** @class */ (function () {
     return Client;
 }());
 var rawQuestions = [
-    'Ich habe schon mal im Büro geschlafen.',
-    'Ich habe schon mal bei andrena geduscht.',
-    'Ich habe schon mal eine Spülmaschine nicht ausgeräumt, obwohl ich die Zeit hatte.',
-    'Ich habe schon mal ein privates Packet zu andrena bestellt.',
-    'Ich habe schon mal länger als 3 Monate vegan gelebt.',
-    'Ich habe schon mal mein Essen im Kühlschrank vergessen.',
-    'Ich habe schon mal einen Arbeitstag mit einem Bier/Wein begonnen.',
-    'Ich habe schon mal einem Meeting auf dem Klo gefolgt.',
+    'Hast du schon mal im Büro geschlafen?',
+    'Hast du schon mal bei andrena geduscht?',
+    'Hast du schon mal eine Spülmaschine nicht ausgeräumt, obwohl ich die Zeit hatte?',
+    'Hast du schon mal ein privates Packet zu andrena bestellt?',
+    'Hast du schon mal länger als 3 Monate vegan gelebt?',
+    'Hast du schon mal mein Essen im Kühlschrank vergessen?',
+    'Hast du schon mal einen Arbeitstag mit einem Bier/Wein begonnen?',
+    'Hast du schon mal einem Meeting auf dem Klo gefolgt?',
 ];
 var questions = [];
 var statistics = [];
@@ -97,6 +100,9 @@ function isAnswerValid(answerObj) {
     }
     return true;
 }
+function isEstimateValid(estimate) {
+    return typeof estimate !== 'undefined' && estimate >= 0 && estimate <= 100;
+}
 io.on("connection", function (socket) {
     console.log("client connected " + socket.id);
     clients[socket.id] = new Client(socket);
@@ -110,7 +116,21 @@ io.on("connection", function (socket) {
             var client = clients[socket.id];
             client.answers[a.id].answer = a.answer;
             statistics[a.id].addAnswer(a.answer);
-            client.statistics[a.id] = statistics[a.id];
+            if (client.answers[a.id].isEverythingAnswered()) {
+                client.statistics[a.id] = statistics[a.id];
+            }
+            dirty = true;
+            socket.emit("answers", client.answers);
+        }
+    });
+    socket.on("estimate", function (a) {
+        if (isEstimateValid(a.estimate)) {
+            console.log("received estimate " + JSON.stringify(a));
+            var client = clients[socket.id];
+            client.answers[a.id].estimate = a.estimate;
+            if (client.answers[a.id].isEverythingAnswered()) {
+                client.statistics[a.id] = statistics[a.id];
+            }
             dirty = true;
             socket.emit("answers", client.answers);
         }
