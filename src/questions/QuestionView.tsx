@@ -23,7 +23,7 @@ function QuestionView({ question, answer, statistics } : {question: Question, an
     </style>
       <Card.Header>
         <Accordion.Toggle as={Button} variant={question.isActive?"link":"button"} eventKey={String(question.id)}>
-          { question.question }
+          { (question.isActive ? "Aktulle Frage: " : "") + question.question }
         </Accordion.Toggle>
       </Card.Header>
       <Accordion.Collapse eventKey={String(question.id)}>

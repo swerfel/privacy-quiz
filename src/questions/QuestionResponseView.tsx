@@ -37,7 +37,7 @@ function PercentageEstimateResponse({ question, answer } : {question: Question, 
       <Form>
         <Form.Group controlId="formBasicRange">
           <Form.Label>Was schätzst du, wie viele % der Teilnehmer haben mit "Ja" geantwortet?</Form.Label>
-          <Form.Control type="range" onChange={handleChange}/>
+          <Form.Control type="range" onChange={handleChange} custom/>
         </Form.Group>
       </Form>
       <Button variant="primary" onClick={onEstimate}>Schätzung abgeben ({value}%)</Button>

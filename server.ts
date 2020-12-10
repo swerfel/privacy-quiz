@@ -71,22 +71,23 @@ class Client {
   statistics: Statistics[];
   score: number = 0;
   scoredEstimates: number = 0;
+  name: string;
   constructor(socket: Socket) {
     this.socket = socket;
     this.answers = rawQuestions.map((_q, index) => new Answer(index));
     this.statistics = new Array(questions.length);
+    this.name = socket.id;
   }
 }
 
 const rawQuestions = [
   'Hast du schon mal im Büro geschlafen?',
   'Hast du schon mal bei andrena geduscht?',
-  'Hast du schon mal eine Spülmaschine nicht ausgeräumt, obwohl ich die Zeit hatte?',
+  'Hast du schon mal eine Spülmaschine nicht ausgeräumt, obwohl du dafür die Zeit gehabt hättest?',
   'Hast du schon mal ein privates Packet zu andrena bestellt?',
-  'Hast du schon mal länger als 3 Monate vegan gelebt?',
-  'Hast du schon mal mein Essen im Kühlschrank vergessen?',
+  'Hast du schon mal dein Essen im Kühlschrank vergessen?',
   'Hast du schon mal einen Arbeitstag mit einem Bier/Wein begonnen?',
-  'Hast du schon mal einem Meeting auf dem Klo gefolgt?',
+  'Bist du schon mal einem Meeting auf dem Klo gefolgt?',
 ];
 const questions: Question[] = [];
 const statistics: Statistics[] = [];
@@ -94,6 +95,7 @@ const statistics: Statistics[] = [];
 var currentQuestionIndex = -1;
 var dirty = true;
 var clients = {};
+var disconnectedClients = {};
 
 function nextQuestion(){
   if (currentQuestionIndex < rawQuestions.length) {
@@ -113,6 +115,7 @@ function nextQuestion(){
 function finalizeCurrentQuestion(){
   questions[currentQuestionIndex].isActive = false;
   Object.values(clients).forEach(computeScore);
+  console.log(statistics[currentQuestionIndex]);
 }
 
 function computeDifference(client: Client, questionIndex: number) {
@@ -143,7 +146,7 @@ function sendUpdatesToSocket(client: Client) {
 }
 
 function computeCurrentScores(){
-  var scores = Object.values(clients).map((client: Client) => {return {playerName: client.socket.id, score: client.score}})
+  var scores = Object.values(clients).map((client: Client) => {return {playerName: client.name, score: client.score}})
   scores.sort(function(a, b){
     if (a.score != b.score)
       return a.score - b.score;
@@ -153,7 +156,6 @@ function computeCurrentScores(){
     if (x > y) {return 1;}
     return 0;
   });
-  console.log("scores: "+JSON.stringify(scores));
   return scores;
 }
 
@@ -195,7 +197,7 @@ io.on("connection", (socket: Socket) => {
   socket.emit("questions", questions);
   if (clients[socket.id].scoredEstimates < currentQuestionIndex) {
     var score = 0;
-    for(var i=0; i <= currentQuestionIndex; i++) {
+    for(var i=0; i < currentQuestionIndex; i++) {
       score += computeDifference(clients[socket.id], i);
     }
     clients[socket.id].scoredEstimates = currentQuestionIndex+1;
@@ -204,11 +206,11 @@ io.on("connection", (socket: Socket) => {
   dirty=true;
 
   socket.on("disconnect", _reason => {
+    disconnectedClients[socket.id] = clients[socket.id];
     delete clients[socket.id];
   })
 
   socket.on("answer", a => {
-    console.log("received answer " + JSON.stringify(a));
     if (isAnswerValid(a)) {
       var client = clients[socket.id];
       client.answers[a.id].answer =  a.answer;
@@ -222,7 +224,6 @@ io.on("connection", (socket: Socket) => {
   })
 
   socket.on("estimate", a => {
-    console.log("received estimate " + JSON.stringify(a));
     if (isEstimateValid(a)) {
       var client = clients[socket.id];
       client.answers[a.id].estimate =  a.estimate;
@@ -235,8 +236,31 @@ io.on("connection", (socket: Socket) => {
     }
   })
 
-  socket.on("next question", nextQuestion);
-});
+  socket.on("name", name => {
+    var client = clients[socket.id];
+    client.name = name;
+    dirty = true;
+    if (name === "Sergej")
+      socket.emit("you are admin");
+  })
+
+  socket.on("restore by id", id => {
+    if (id) {
+      var old = disconnectedClients[id];
+      if (old) {
+        old.socket = socket;
+        clients[socket.id] = old;
+        dirty = true;
+      }
+    }
+  })
+
+  socket.on("next question", () => {
+    if (clients[socket.id].name === "Sergej") {
+      nextQuestion();
+    }
+  });
+})
 
 setInterval(sendUpdateToAllSockets, 1000);
 
