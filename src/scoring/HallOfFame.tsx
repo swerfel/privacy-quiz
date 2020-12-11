@@ -2,9 +2,17 @@ import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-import { useSubscription } from '../util/Sockets';
+import { useSubscription, socket } from '../util/Sockets';
 
 import {Score} from './Score';
+
+function ScoreView({score}: {score: Score}) {
+  if (score.id === socket.id)  {
+    return (<b>{score.playerName}(Du): {score.score}</b>);
+  } else {
+    return (<>{score.playerName}: {score.score}</>);
+  }
+}
 
 function HallOfFame() {
   const [scores, setScores] = useState<Score[]>([]);
@@ -15,7 +23,9 @@ function HallOfFame() {
       <Card.Header>Beste Schätzer:</Card.Header>
       <ListGroup variant="flush">
         {scores.map(score =>
-          <ListGroup.Item key={score.playerName}>{score.playerName}: {score.score}</ListGroup.Item>
+          <ListGroup.Item key={score.playerName}>
+            <ScoreView score={score}/>
+          </ListGroup.Item>
         )}
       </ListGroup>
       <Card.Footer className="text-muted">Score: Summe der Differenzen der Andrena-Antworten zu der eigenen Schätzung. D.h. kleiner ist besser ;)</Card.Footer>

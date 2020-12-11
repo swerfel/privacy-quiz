@@ -17,7 +17,7 @@ function NameView(){
       <InputGroup.Text id="nameLabel">Dein Name</InputGroup.Text>
     </InputGroup.Prepend>
     <FormControl
-      placeholder="Bitte Name eingeben"
+      placeholder="Bitte Name eingeben. (Die Antworten werden nicht gespeichert, nur deine Schätzabweichung wird anderen angezeigt)"
       aria-label="Spielername"
       aria-describedby="nameLabel"
       onChange={handleChange}

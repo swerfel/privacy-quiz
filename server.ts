@@ -86,6 +86,7 @@ const rawQuestions = [
   'Hast du schon mal eine Spülmaschine nicht ausgeräumt, obwohl du dafür die Zeit gehabt hättest?',
   'Hast du schon mal ein privates Packet zu andrena bestellt?',
   'Hast du schon mal dein Essen im Kühlschrank vergessen?',
+  'Hast du schon mal beim Kickern gemogelt?',
   'Hast du schon mal einen Arbeitstag mit einem Bier/Wein begonnen?',
   'Bist du schon mal einem Meeting auf dem Klo gefolgt?',
 ];
@@ -146,7 +147,7 @@ function sendUpdatesToSocket(client: Client) {
 }
 
 function computeCurrentScores(){
-  var scores = Object.values(clients).map((client: Client) => {return {playerName: client.name, score: client.score}})
+  var scores = Object.values(clients).map((client: Client) => {return {playerName: client.name, score: client.score, id: client.socket.id}})
   scores.sort(function(a, b){
     if (a.score != b.score)
       return a.score - b.score;
