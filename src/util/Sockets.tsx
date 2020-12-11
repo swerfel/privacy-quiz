@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import Cookies from 'universal-cookie';
 
-export const socket = io("localhost:3001", { transports : ['websocket'] });
+export const socket = (process.env.NODE_ENV === "development") ? io("localhost:3001", { transports : ['websocket'] }) : io();
 socket.on("connect", () => {
   console.log("connected");
 
