@@ -16,7 +16,7 @@ function ScoreView({score}: {score: Score}) {
 
 function HallOfFame() {
   const [scores, setScores] = useState<Score[]>([]);
-  useSubscription("scores", (s: Score[]) => {setScores(s); console.log(s)});
+  useSubscription("scores", setScores);
 
   return (
     <Card>

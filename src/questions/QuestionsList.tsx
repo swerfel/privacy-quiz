@@ -28,7 +28,7 @@ function QuestionsList() {
 
   useSubscription("questions", onNewQuestions);
   useSubscription("answers", setAnswers);
-  useSubscription("statistics", (s: Statistics[]) => {setStatistics(s); console.log(s)});
+  useSubscription("statistics", setStatistics);
 
   return (
     <Accordion defaultActiveKey="0" activeKey={activeQuestion} onSelect={onSelect}>
