@@ -21,5 +21,5 @@ export const useSubscription = (event: string, listener: Function) => {
         return () => {
           socket.off(event);
         };
-      }, []);
+      }, [event, listener]);
 }

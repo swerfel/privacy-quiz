@@ -1,36 +1,38 @@
+
+import { Box, createStyles, makeStyles, Theme, Typography } from '@material-ui/core';
 import React from 'react';
-import styled from 'styled-components'
 import logo from './Logo.jpg';
 
-const Container = styled.header`
-    background-color: #1b5f9e;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: lightgray;
-    overflow: hidden;
-`
-
-const Title = styled.h2`
-    color: white;
-    position: absolute;
-    top: 10px;
-`
-
-const Paragraph = styled.p`
-    position: absolute;
-    top: 45px;
-`
-
+const useStyles = makeStyles((theme: Theme) => createStyles({
+  root: {
+    backgroundColor: '#1b5f9e',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'lightgray',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  heading: {
+    color: '#51a025',
+    position: 'absolute',
+    bottom: '30px',
+  }
+}),
+);
 
 function Header() {
+  const classes = useStyles();
+
   return (
-    <Container>
+    <header  className={classes.root}>
           <img src={logo} alt="Logo" />
-          <Title>Andrena-Privacy</Title>
-          <Paragraph>Wie gut kannst du deine Kollegen einschätzen?</Paragraph>
-    </Container>
+          <Box textAlign="center" className={classes.heading}>
+            <h1>Andrena-Privacy</h1>
+            <Typography>Wie gut kannst du deine Kollegen einschätzen?</Typography>
+          </Box>
+    </header>
   );
 }
 

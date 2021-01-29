@@ -1,8 +1,8 @@
+import { Button } from '@material-ui/core';
 import {useState} from 'react';
 
 import { socket, useSubscription } from '../util/Sockets';
 
-import Button from 'react-bootstrap/Button';
 
 function AdminControls(){
 const [admin, setAdmin] = useState(false);
@@ -12,7 +12,7 @@ const [admin, setAdmin] = useState(false);
 
   if (admin)
     return (
-      <Button variant="danger" onClick={onResponse}>Nächste Frage</Button>
+      <Button variant="contained" color="secondary" onClick={onResponse}>Nächste Frage</Button>
     );
   else
     return null;

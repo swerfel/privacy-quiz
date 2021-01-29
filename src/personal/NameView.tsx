@@ -1,31 +1,45 @@
-import {useState} from 'react';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
-import Button from 'react-bootstrap/Button';
+import { Box, IconButton, Paper, TextField } from '@material-ui/core';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import SendIcon from '@material-ui/icons/Send';
+import {FormEvent, useState} from 'react';
 
 import  { socket } from '../util/Sockets';
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    margin: {
+      margin: theme.spacing(1),
+    },
+  }),
+);
+
 function NameView(){
+  const classes = useStyles();
   const [name, setName] = useState("");
   var onApply = () => socket.emit("name", name);
   var handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(String(e.target.value));
+    setName(e.target.value);
+  };
+  var submitName = (e: FormEvent) => {
+    e.preventDefault();
+    onApply();
   };
   return (
-  <InputGroup className="mb-3">
-    <InputGroup.Prepend>
-      <InputGroup.Text id="nameLabel">Dein Name</InputGroup.Text>
-    </InputGroup.Prepend>
-    <FormControl
-      placeholder="Bitte Name eingeben. (Die Antworten werden nicht gespeichert, nur deine Schätzabweichung wird anderen angezeigt)"
-      aria-label="Spielername"
-      aria-describedby="nameLabel"
-      onChange={handleChange}
-    />
-    <InputGroup.Append>
-      <Button variant="success" onClick={onApply}>Übernehmen</Button>
-    </InputGroup.Append>
-  </InputGroup>);
+        <Paper>
+          <form onSubmit={submitName}>
+            <Box display="flex"> 
+              <Box flexGrow={1}>
+                <TextField fullWidth className={classes.margin} onChange={handleChange} id="name" label="Name" value={name}
+                  placeholder="Name (Die Antworten werden nicht gespeichert, nur deine Schätzabweichung wird den Anderen angezeigt)"/>
+              </Box>
+              <Box>
+                <IconButton aria-label="Übernehmen" onClick={onApply} color="primary"  className={classes.margin}>
+                  <SendIcon/>
+                </IconButton></Box>
+            </Box>
+          </form>
+        </Paper>
+  );
 }
 
 export default NameView;

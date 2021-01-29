@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
+import { Card, CardContent, Typography, List, ListItem } from '@material-ui/core';
 
 import { useSubscription, socket } from '../util/Sockets';
 
@@ -19,16 +18,23 @@ function HallOfFame() {
   useSubscription("scores", setScores);
 
   return (
+    
     <Card>
-      <Card.Header>Beste Schätzer:</Card.Header>
-      <ListGroup variant="flush">
+      <CardContent>
+        <h3>
+          Beste Schätzer:
+        </h3>
+        <List>
         {scores.map(score =>
-          <ListGroup.Item key={score.playerName}>
+          <ListItem key={score.id}>
             <ScoreView score={score}/>
-          </ListGroup.Item>
+          </ListItem>
         )}
-      </ListGroup>
-      <Card.Footer className="text-muted">Score: Summe der Differenzen der Andrena-Antworten zu der eigenen Schätzung. D.h. kleiner ist besser ;)</Card.Footer>
+        </List>
+        <Typography gutterBottom>
+          Score: Summe der Differenzen der Andrena-Antworten zu der eigenen Schätzung. D.h. kleiner ist besser ;)
+        </Typography>
+      </CardContent>
     </Card>
 
   );
