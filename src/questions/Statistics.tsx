@@ -3,4 +3,5 @@ export interface Statistics {
   yesAnswers: number;
   noAnswers: number;
   percentage: number;
+  estimates: number[];
 }

@@ -9,6 +9,7 @@ import { StatisticsView } from './StatisticsView';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { YesNoResponse } from './YesNoResponseView';
 import { EstimationResponse } from './EstimationResponseView';
+import { Histogram } from './Histogram';
 
 function AccordionHeader({isActive, children}: {isActive: boolean, children: ReactNode}) {
   if(isActive)
@@ -57,6 +58,8 @@ function QuestionsList() {
               <Grid item>
                 <h4>Antworten deiner Mitspieler*innen:</h4>
                 <StatisticsView statistics={statistics[question.id]}/>
+                <h4>Schätzungen deiner Mitspieler*innen:</h4>
+                <Histogram values={statistics[question.id].estimates}/>
               </Grid>
             }
             {answers[question.id]?.answer && <Grid item>

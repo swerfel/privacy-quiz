@@ -22,7 +22,7 @@ function HallOfFame() {
     <Card>
       <CardContent>
         <h3>
-          Beste Schätzer:
+          Bestenliste:
         </h3>
         <List>
         {scores.map(score =>

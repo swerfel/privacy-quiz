@@ -9,8 +9,7 @@ import { Button, Grid, Slider } from '@material-ui/core';
 export function EstimationResponse({ question, answer } : {question: Question, answer: Answer}) {
     const [ value, setValue ] = useState(50);
 
-
-    if (answer && answer.estimate)
+    if (answer && (answer.estimate || answer.estimate === 0))
       return (<p>Du hast geschätzt, dass <b>{answer.estimate}%</b> der MitspielerInnen "Ja" geantwortet haben.</p>)
     else if (question.isActive) {
       var onEstimate = () => socket.emit("estimate", {id: question.id, estimate: value})
