@@ -1,5 +1,4 @@
 
-import { Histogram } from './Histogram';
 import { Statistics } from './Statistics';
 
 export function StatisticsView({ statistics } : {statistics: Statistics}) {

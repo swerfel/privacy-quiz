@@ -2,17 +2,21 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import Cookies from 'universal-cookie';
 
+const cookies = new Cookies();
+const COOKIE = "PrivacyFirstSocketIdForRecovery";
+
 export const socket = (process.env.NODE_ENV === "development") ? io("localhost:3001", { transports : ['websocket'] }) : io();
 socket.on("connect", () => {
-  console.log("connected");
-
-  const cookies = new Cookies();
-  var id = cookies.get('PrivacyFirstSocketIdForRecovery');
-  if (id && id.length > 0) {
-    socket.emit("restore by id", id);
+  
+  var previousID = cookies.get(COOKIE);
+  if (previousID && previousID.length > 0) {
+    socket.emit("restore player by id", previousID);
   } else {
-    cookies.set('PrivacyFirstSocketIdForRecovery', socket.id, { path: '/' });
+    cookies.set(COOKIE, socket.id, { path: '/' });
   }
+})
+socket.on("restore player not possible", () => {
+  cookies.set(COOKIE, socket.id, { path: '/' });
 })
 
 export const useSubscription = (event: string, listener: Function) => {
