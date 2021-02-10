@@ -37,8 +37,8 @@ function QuestionsList() {
   };
 
   useSubscription("questions", onNewQuestions);
-  useSubscription("answers", useCallback((newAnswers: Answer[]) => setAnswers, [setAnswers]));
-  useSubscription("statistics", useCallback((newStats: Statistics[]) => setStatistics, [setStatistics]));
+  useSubscription("answers", useCallback(setAnswers, [setAnswers]));
+  useSubscription("statistics", useCallback(setStatistics, [setStatistics]));
 
   return (<>
     {questions.map(question =>
