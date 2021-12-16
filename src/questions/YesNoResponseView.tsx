@@ -16,7 +16,7 @@ export function YesNoResponse({ question, answer } : {question: Question, answer
       }
       return (
         <Grid container spacing={2}>
-          <Grid item><Box>Und? Hast du?:</Box></Grid>
+          <Grid item><Box>Stimmt die Aussage für dich?:</Box></Grid>
           <Grid item><Button variant="contained" color="primary" onClick={onResponse("yes")}>Ja</Button></Grid>
           <Grid item><Button variant="contained" color="primary" onClick={onResponse("no")}>Nein</Button></Grid>
         </Grid>)

@@ -22,7 +22,7 @@ function HallOfFame() {
     <Card>
       <CardContent>
         <h3>
-          Bestenliste:
+          Bestenliste (aus {scores.length} Mitspieler*innen):
         </h3>
         <List>
         {scores.map(score =>
