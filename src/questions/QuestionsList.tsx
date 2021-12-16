@@ -49,7 +49,7 @@ function QuestionsList() {
           id={String(question.id)}
         >
           <AccordionHeader isActive={question.id === selectedQuestion}>
-            { (question.isActive ? "Aktulle Frage: " : "") + question.question }
+            { (question.isActive ? "Aktulle Aussage: " : "") + question.question }
           </AccordionHeader>
         </AccordionSummary>
         <AccordionDetails>
