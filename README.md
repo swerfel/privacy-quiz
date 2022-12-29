@@ -1,4 +1,14 @@
-# Getting Started with Create React App
+# Privacy Quiz
+## Description
+This is the client for a simple online game inspired by the board game Privacy. It was played during the pandemic in socializing events.
+
+The server can be found in this repo: https://github.com/swerfel/privacy-quiz-server
+
+Pay attention: this project is not maintained. Most dependencies are outdated.
+
+
+
+# Default-"Getting Started with Create React App"
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
